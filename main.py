@@ -1,3 +1,4 @@
+from turtle import title
 import pandas as pd
 
 movies = pd.read_csv('./movie-lens-data/movies.csv')
@@ -8,13 +9,14 @@ tags = pd.read_csv('./movie-lens-data/tags.csv')
 #create profile of movies and various recieved ratings  
 mainDataFrame = pd.merge(ratings, movies, on="movieId")
 movieMatrix = mainDataFrame.pivot_table(index='userId', columns='title', values='rating')
-movieSeacher = mainDataFrame.pivot_table(index='title', values='movieId')
 
 #computes similarity for move-movie pairs using centered cosine similarity method
 corrMatrix = movieMatrix.corr(method='pearson', min_periods= 50)
 
+outfile = open("./output.txt", "w")
+
 #iterates users
-for i in range(1,2): #len(movieMatrix) for final
+for i in range(1,len(movieMatrix)):
     #gets user's ratings
     userRatings = movieMatrix.iloc[i].dropna()
     reccomend = pd.Series()
@@ -30,11 +32,15 @@ for i in range(1,2): #len(movieMatrix) for final
     reccomend.sort_values(inplace= True, ascending= False)
 
     #prints top 5 reccomended to file
-    
     x = pd.DataFrame(reccomend)
     reccomendFilter = x[~x.index.isin(userRatings.index)]
     holdItems = reccomendFilter.head(5)
-    print("User Id " + str(i))
+    outfile.write(str(i))
+    outfile.write(' ')
     for j in range (0, 5):
-        print(holdItems.iloc[j].name)
-    #print(reccomendFilter.head(5))
+        for k in range (0, len(movies)):
+            if(movies.iloc[k, 1] == holdItems.iloc[j].name):
+                outfile.write(str(movies.iloc[k, 0]))
+                outfile.write(' ')
+    outfile.write('\n')
+outfile.close()
