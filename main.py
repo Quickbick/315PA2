@@ -37,7 +37,8 @@ for i in range(1,len(movieMatrix)):
     holdItems = reccomendFilter.head(5)
     outfile.write(str(i))
     outfile.write(' ')
-    for j in range (0, 5):
+    holdmax = min(5, len(holdItems))
+    for j in range (0, holdmax):
         for k in range (0, len(movies)):
             if(movies.iloc[k, 1] == holdItems.iloc[j].name):
                 outfile.write(str(movies.iloc[k, 0]))
